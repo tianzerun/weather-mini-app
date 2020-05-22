@@ -1,5 +1,11 @@
 # Wechat Mini Program - Weather App
 
+#### Lesson 5
+##### Notes
+- Set `flex-grow: <number>` and `text-align: right` to justify an element all the way to the right.
+- Set `left` and `right` style attributes to stretch a component horizontally and fix left and right sides to specified locations.
+--- 
+
 #### Lesson 4
 ##### Notes
 - Set the `wx:for={{someList}}` property to create a list of components in wxml.
