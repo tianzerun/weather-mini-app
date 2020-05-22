@@ -20,7 +20,8 @@ Page({
   data: {
     nowTemp: '',
     nowWeather: '',
-    nowWeatherBg: ''
+    nowWeatherBg: '',
+    hourlyWeather: []
   },
   onLoad() {
     this.getNow();
@@ -36,22 +37,41 @@ Page({
       },
       success: res => {
         let result = res.data.result;
-        let temp = result.now.temp;
-        let weather = result.now.weather;
-        this.setData({
-          nowTemp: `${temp}°`,
-          nowWeather: weatherMap[weather],
-          nowWeatherBg: `/images/${weather}-bg.png`
-        });
-        wx.setNavigationBarColor({
-          frontColor: '#000000',
-          backgroundColor: weatherColorMap[weather],
-        });
+        this.setNow(result);
+        this.setHourlyForecast(result);
       },
       complete: () => {
-        console.log(callback)
         callback && callback();
       }
+    });
+  },
+  setNow(result) {
+    let temp = result.now.temp;
+    let weather = result.now.weather;
+    this.setData({
+      nowTemp: `${temp}°`,
+      nowWeather: weatherMap[weather],
+      nowWeatherBg: `/images/${weather}-bg.png`
+    });
+    wx.setNavigationBarColor({
+      frontColor: '#000000',
+      backgroundColor: weatherColorMap[weather],
+    });
+  },
+  setHourlyForecast(result) {
+    let forecast = result.forecast;
+    let hourlyWeather = [];
+    let nowHour = new Date().getHours();
+    for (let i = 0; i < 8; i++) {
+      hourlyWeather.push({
+        time: (nowHour + i*3) % 24 + ":00",
+        iconPath: `/images/${forecast[i].weather}-icon.png`,
+        temp: `${forecast[i].temp}°`
+      });
+    }
+    hourlyWeather[0].time = "now";
+    this.setData({
+      hourlyWeather: hourlyWeather
     });
   }
 })
