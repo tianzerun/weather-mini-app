@@ -7,9 +7,14 @@
   "window": {
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#cbeefd",
-    "navigationBarTitleText": "WeChat",
+    "navigationBarTitleText": "Weather",
     "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "位置将用于提供当地天气信息"
+    }
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

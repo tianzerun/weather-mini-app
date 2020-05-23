@@ -1,5 +1,10 @@
 # Wechat Mini Program - Weather App
 
+#### Lession 6
+##### Notes
+- Enable conditional rendering with `wx:if` to render a view only when the condition evaluates to true. e.x. `<view wx:if="{{locationAuthType==0}}">Tab to obtain the location</view>`
+
+
 #### Lesson 5
 ##### Notes
 - Set `flex-grow: <number>` and `text-align: right` to justify an element all the way to the right.
@@ -19,3 +24,4 @@
 - console: https://mp.weixin.qq.com/
 - doc-en: https://developers.weixin.qq.com/miniprogram/en/dev/
 - doc-cn: https://developers.weixin.qq.com/miniprogram/dev/
+- flexbox explained: https://css-tricks.com/snippets/css/a-guide-to-flexbox/

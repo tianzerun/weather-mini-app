@@ -5,16 +5,20 @@ const weatherMap = {
   'lightrain': 'light rain',
   'heavyrain': 'heavy rain',
   'snow': 'snow'
- }
+ };
 
- const weatherColorMap = {
+const weatherColorMap = {
   'sunny': '#cbeefd',
   'cloudy': '#deeef6',
   'overcast': '#c6ced2',
   'lightrain': '#bdd5e1',
   'heavyrain': '#c5ccd0',
   'snow': '#aae1fc'
- }
+ };
+
+const UNPROMPTED = 0;
+const UNAUTHORIZED = 1;
+const AUTHORIZED = 2;
 
 Page({
   data: {
@@ -23,10 +27,28 @@ Page({
     nowWeatherBg: '',
     hourlyWeather: [],
     todayTemp: '',
-    todayDate: ''
+    todayDate: '',
+    city: 'Boston',
+    locationAuthType: UNPROMPTED
   },
   onLoad() {
-    this.getNow();
+    wx.getSetting({
+      success: (res) => {
+        let auth = res.authSetting["scope.userLocation"];
+        this.setData({
+          locationAuthType: auth ? AUTHORIZED 
+          : (auth === false) ? UNAUTHORIZED : UNPROMPTED
+        });
+        if (auth) {
+          this.getCityAndWeather();
+        } else {
+          this.getNow(); // default city - Boston
+        }
+      },
+      fail: () => {
+        this.getNow(); // default city - Boston
+      }
+    })
   },
   onPullDownRefresh() {
     this.getNow(wx.stopPullDownRefresh);
@@ -35,7 +57,7 @@ Page({
     wx.request({
       url: 'https://test-miniprogram.com/api/weather/now',
       data: {
-        city: "beijing"
+        city: this.data.city
       },
       success: res => {
         let result = res.data.result;
@@ -86,7 +108,64 @@ Page({
   },
   onTapDayWeather() {
     wx.navigateTo({
-      url: '/pages/list/list',
+      url: '/pages/list/list?city=' + this.data.city,
+    })
+  },
+  onTapLocation() {
+    if (this.data.locationAuthType === UNAUTHORIZED) {
+      wx.openSetting({
+        success: (res) => {
+          let auth = res.authSetting["scope.userLocation"]
+          if (auth) {
+            this.setData({
+              locationAuthType: AUTHORIZED
+            });
+            this.getCityAndWeather();
+          }
+        },
+        fail: () => {
+          this.setData({
+            locationAuthType: UNAUTHORIZED
+          });
+        }
+      })
+    } else {
+      this.getCityAndWeather();
+    }
+  },
+  getCityAndWeather() {
+    wx.getLocation({
+      success: res => {
+        this.setData({
+          locationAuthType: AUTHORIZED 
+        });
+        this.reverseGeocoder(res.latitude, res.longitude);
+      },
+      fail: () => {
+        this.setData({
+          locationAuthType: UNAUTHORIZED
+        });
+      }
+    })
+  },
+  reverseGeocoder(lat, lon) {
+    wx.request({
+      url: 'https://nominatim.openstreetmap.org/reverse',
+      data: {
+        format: "json",
+        lat,
+        lon
+      },
+      header: {
+        'content-type': 'application/json'
+      },
+      success: (res) => {
+        let city = res.data.address.city;
+        this.setData({
+          city: city
+        });
+        this.getNow();
+      }
     })
   }
 })
